@@ -39,9 +39,9 @@ with open('optdigits.tes', 'r') as testingFile:
 
   classPredict = []
   classPredict_rf = []
+
   for k in range(20): #we will create 20 bootstrap samples here (k = 20). One classifier will be created for each bootstrap sample
-      right = 0
-      accuracy = 0
+
       bootstrapSample = resample(dbTraining, n_samples=len(dbTraining), replace=True)
 
       #populate the values of X_training and Y_training by using the bootstrapSample
@@ -52,19 +52,15 @@ with open('optdigits.tes', 'r') as testingFile:
       for i in range(len(bootstrapSample)):
           Y_training.append(bootstrapSample[i][64])
 
-      #for i in range(len(bootstrapSample)):
-      #    print(Y_training[i], "\n")
+      
 
 
       #fitting the decision tree to the data
       clf = tree.DecisionTreeClassifier(criterion = 'entropy', max_depth=None) #we will use a single decision tree without pruning it
       clf = clf.fit(X_training, Y_training)
 
-       #for i, testSample in enumerate(dbTest):
 
-      #classPredict = []
       for i, testSample in enumerate(dbTest):
-         # classPredict = []
 
           #make the classifier prediction for each test sample and update the corresponding index value in classVotes. For instance,
           # if your first base classifier predicted 2 for the first test sample, then classVotes[0,0,0,0,0,0,0,0,0,0] will change to classVotes[0,0,1,0,0,0,0,0,0,0].
@@ -72,17 +68,14 @@ with open('optdigits.tes', 'r') as testingFile:
           # Later, if your third base classifier predicted 3 for the first test sample, then classVotes[0,0,1,1,0,0,0,0,0,0] will change to classVotes[0,0,1,2,0,0,0,0,0,0]
           # this array will consolidate the votes of all classifier for all test samples
           #--> add your Python code here
-          #for j in range(len(dbTest)):
+          
           class_predicted = int(clf.predict([dbTest[i][:65]])[0])
           classPredict.append(class_predicted)
           classVotes[i][class_predicted] += 1 
 
          
          
-#print(classVotes)
-          #print(len(classPredict), '\n')
-
-
+          
           if k == 0: #for only the first base classifier, compare the prediction with the true label of the test sample here to start calculating its accuracy
              #--> add your Python code here
              right = 0
@@ -90,8 +83,12 @@ with open('optdigits.tes', 'r') as testingFile:
              for j in range(len(dbTest)):
                  if class_predicted == int(dbTest[j][64]):
                      right += 1
+             
+             
+                 
 
       accuracy = right / len(dbTest)
+     
 
       if k == 0: #for only the first base classifier, print its accuracy here
          #--> add your Python code here
@@ -116,7 +113,7 @@ with open('optdigits.tes', 'r') as testingFile:
               val = classVotes[j].index(classVotes[j][k])
           vals.append(val)
   
-#print(vals)
+
   for j in range(len(dbTest)):
       if vals[j] == int(dbTest[j][64]):
           right += 1
@@ -139,16 +136,17 @@ with open('optdigits.tes', 'r') as testingFile:
 
   #make the Random Forest prediction for each test sample. Example: class_predicted_rf = clf.predict([[3, 1, 2, 1, ...]]
   #--> add your Python code here
-  class_predicted_rf = int(clf.predict([dbTest[i][:65]])[0])
-  classPredict_rf.append(class_predicted_rf)
-  classVotes[i][class_predicted] += 1 
+  for i in range(len(dbTest)):
+      class_predicted_rf = int(clf.predict([dbTest[i][:65]])[0])
+      classPredict_rf.append(class_predicted_rf)
+
 
   #compare the Random Forest prediction for each test sample with the ground truth label to calculate its accuracy
   #--> add your Python code here
   right = 0
   accuracy = 0
   for j in range(len(dbTest)):
-      if class_predicted == int(dbTest[j][64]):
+      if classPredict_rf[j] == int(dbTest[j][64]):
           right += 1
 
   accuracy = right / len(dbTest)
